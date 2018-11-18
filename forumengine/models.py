@@ -5,6 +5,7 @@ from django.shortcuts import reverse
 class Category(models.Model):
     category_id = models.AutoField(primary_key=True)
     title = models.CharField(max_length=80, blank=False, null=False, default='test')
+    description = models.TextField(max_length=300, blank=True, default='default description')
     slug = models.SlugField(max_length=255, unique=True)
 
     def __str__(self):
