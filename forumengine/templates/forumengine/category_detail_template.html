@@ -1,0 +1,13 @@
+
+
+
+{% block content %}
+
+<h1 class="mt-5">
+    {{ category.title }}
+</h1>
+{% for topic in topic_list %}
+   {{ topic.title }}
+{% endfor %}
+
+{% endblock%}

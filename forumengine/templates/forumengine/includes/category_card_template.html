@@ -1,0 +1,17 @@
+{% extends 'base.html '%}
+{% block header %}
+{% endblock %}
+
+{%block content %}
+<div class="row">
+  <div class="col-sm-12">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">{{ category.title }}</h5>
+        <p class="card-text">Soon</p>
+        <a href="{{category.get_absolute_url}}" class="btn btn-primary">Перейти</a>
+      </div>
+    </div>
+  </div>
+</div>
+{%endblock %}

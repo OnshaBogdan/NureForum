@@ -1,0 +1,11 @@
+{% extends 'base.html '%}
+
+{% block title %}
+{{ title }}
+{% endblock %}
+
+{% block content %}
+    {% for category in category_list%}
+            {% include 'forumengine/includes/category_card_template.html' %}
+    {% endfor %}
+{% endblock %}
