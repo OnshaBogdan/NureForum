@@ -3,6 +3,11 @@ from django.shortcuts import reverse
 from django.contrib.auth.models import User
 
 
+class ForumUser(User):
+    user_id = models.AutoField(primary_key=True)
+    rating = models.IntegerField(blank=False, null=False, default=0)
+
+
 class Category(models.Model):
     category_id = models.AutoField(primary_key=True)
     title = models.CharField(max_length=80, blank=False, null=False, default='test')
@@ -18,7 +23,7 @@ class Category(models.Model):
     def save(self, *args, **kwargs):
         super(Category, self).save(*args, **kwargs)
         if not self.slug:
-            self.slug = str('cat_') + str(self.category_id)
+            self.slug = str(self.category_id)
             self.save()
 
 
@@ -29,6 +34,7 @@ class Topic(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, blank=False)
     rating = models.IntegerField(blank=False, null=False, default=0)
     slug = models.SlugField(max_length=255, unique=True)
+    author = models.ForeignKey(ForumUser, on_delete=models.CASCADE, blank=False, null=False)
 
     def __str__(self):
         return self.title
@@ -36,13 +42,11 @@ class Topic(models.Model):
     def save(self, *args, **kwargs):
         super(Topic, self).save(*args, **kwargs)
         if not self.slug:
-            self.slug = str('topic_') + str(self.topic_id)
+            self.slug = str(self.topic_id)
             self.save()
 
-
-class ForumUser(User):
-    user_id = models.AutoField(primary_key=True)
-    rating = models.IntegerField(blank=False, null=False, default=0)
+    def get_absolute_url(self):
+        return reverse('topic_detail_view', kwargs={'slug': self.slug})
 
 
 class Message(models.Model):

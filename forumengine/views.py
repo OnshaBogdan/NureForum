@@ -21,3 +21,13 @@ class CategoryDetail(View):
                    'topic_list': Topic.objects.filter(category=obj)
                    }
         return render(request, 'forumengine/category_detail_template.html', context=context)
+
+
+class TopicDetail(View):
+
+    def get(self, request, slug):
+        obj = get_object_or_404(Topic, slug__iexact=slug)
+        context = {'topic': obj,
+                   'message_list': Message.objects.filter(topic=obj)
+                   }
+        return render(request, 'forumengine/topic_detail_template.html', context=context)
