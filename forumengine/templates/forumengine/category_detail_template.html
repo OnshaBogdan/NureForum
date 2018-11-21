@@ -1,13 +1,16 @@
 {%extends 'base.html'%}
 
 
+
+
 {% block content %}
 
-<h1 class="mt-5">
+<h1 class="mb-5 text-center">
     {{ category.title }}
+
 </h1>
 {% for topic in topic_list %}
-   {{ topic.title }}
+{% include 'forumengine/includes/topic_card_template.html' %}
 {% endfor %}
 
 {% endblock%}

@@ -2,13 +2,15 @@
 
 {% block title %}
 {{ title }}
+
 {% endblock %}
 
+
 {% block content %}
-    <h1 class="text-center"> Добро пожаловать!</h1>
-    <h2 class="text-center">Категории: </h2>
-    {% for category in category_list%}
-            {% include 'forumengine/includes/category_card_template.html' %}
-    {% endfor %}
+
+<h2 class="text-center">Категории: </h2>
+{% for category in category_list%}
+{% include 'forumengine/includes/category_card_template.html' %}
+{% endfor %}
 
 {% endblock %}
