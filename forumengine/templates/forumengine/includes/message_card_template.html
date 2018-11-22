@@ -1,0 +1,17 @@
+{% extends 'base.html '%}
+
+{% block header %}
+{% endblock %}
+
+
+{%block content%}
+<div class="card message-card">
+  <div class="card-header">
+    {{ message.author }} at {{message.date_of_pub }}
+  </div>
+  <div class="card-body">
+    <p class="card-text">{{message.body}}</p>
+  </div>
+  <div class="card-footer"><i class="fas fa-arrows-alt-v"></i> {{message.rating}}</div>
+</div>
+{%endblock%}

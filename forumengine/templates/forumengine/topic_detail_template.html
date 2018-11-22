@@ -10,7 +10,7 @@
 
 </h1>
 {% for message in message_list%}
-    {{ message.body }}
+   {% include 'forumengine/includes/message_card_template.html' %}
 {% endfor %}
 
 {% endblock%}
