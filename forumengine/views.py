@@ -2,15 +2,8 @@ from django.views.generic import View
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404
 from forumengine.models import *
+from forumengine.utils import *
 from django.http import HttpResponse
-
-
-def category_list(request):
-    content = {
-        'category_list': Category.objects.all(),
-    }
-
-    return render(request, 'forumengine/index.html', context=content)
 
 
 class CategoryDetail(View):
@@ -31,3 +24,16 @@ class TopicDetail(View):
                    'message_list': Message.objects.filter(topic=obj)
                    }
         return render(request, 'forumengine/topic_detail_template.html', context=context)
+
+
+def users_list(request):
+    users = ForumUser.objects.order_by('-rating')[:10]
+    return render(request, 'forumengine/users_list_template.html', context={'users': users})
+
+
+def category_list(request):
+    content = {
+        'category_list': Category.objects.all(),
+    }
+
+    return render(request, 'forumengine/index.html', context=content)

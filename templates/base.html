@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <title>
         {% block title %}
-            Nure Forum
+        Nure Forum
         {% endblock %}
     </title>
 
@@ -21,19 +21,27 @@
     {% endblock %}
 </head>
 <body>
-    {%block header%}
-    <!-- Image and text -->
-    <nav class="navbar navbar-light bg-light">
-        <a class="navbar-brand" href="#">
-        <img src="{% static 'forumengine/images/nure_logo.png'%}" width="30" height="30" class="d-inline-block align-top" alt="">
+{%block header%}
+<!-- Image and text -->
+<nav class="navbar navbar-light bg-light">
+    <a class="navbar-brand" href="{% url 'category_list_view'%}">
+        <img src="{% static 'forumengine/images/nure_logo.png'%}" width="30" height="30"
+             class="d-inline-block align-top" alt="">
         Nure Forum
-        </a>
-    </nav>
-    {%block breadcrumb%}
-    {%endblock %}
-    {% endblock %}
-    {% block content %}
-        if you see this, you've fucked up
-    {% endblock %}
+    </a>
+    <div class="navbar-right navbar-icon-container">
+        <ul class="list-inline navbar-icon-ul">
+            <li class="list-inline-item"><i class="fas fa-sign-in-alt  fa-lg"></i></li>
+            <li class="list-inline-item"><i class="fas fa-user-plus  fa-lg"></i></li>
+        </ul>
+    </div>
+
+</nav>
+{%block breadcrumb%}
+{%endblock %}
+{% endblock %}
+{% block content %}
+if you see this, you've fucked up
+{% endblock %}
 </body>
 </html>

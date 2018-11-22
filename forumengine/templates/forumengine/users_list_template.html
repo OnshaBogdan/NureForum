@@ -1,0 +1,39 @@
+{% extends 'base.html '%}
+{% load users_list_extras %}
+
+{% block title %}
+Users list - {{ block.super }}
+{% endblock %}
+
+{% block content %}
+<h3 class="mb-5 text-center">Top 10 users by rating:</h3>
+
+<table class="table table-hover table-bordered w-75 user-rating-table">
+    <thead class="thead-light">
+    <tr>
+        <th scope="col">#</th>
+        <th scope="col">Username</th>
+        <th scope="col">Rate</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for index, user in users|order %}
+    <tr>
+        {% if index == 1%}
+            <th scope="col"> {{ index }}<i class="fas fa-trophy gold"></i></th>
+        {% elif index == 2 %}
+            <th scope="col"> {{ index }}<i class="fas fa-trophy silver"></i></th>
+        {% elif index == 3 %}
+            <th scope="col"> {{ index }}<i class="fas fa-trophy bronze"></i></th>
+        {% else%}
+        <th scope="col">{{ index }}</th>
+        {% endif %}
+        <th scope="col"><a href={{user.get_absolute_url}}>{{user.username}}</a></th>
+        <th scope="col">{{user.rating}}</th>
+    </tr>
+    {% endfor %}
+    </tbody>
+
+</table>
+
+{% endblock %}
