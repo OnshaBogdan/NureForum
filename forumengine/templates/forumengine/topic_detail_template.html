@@ -7,9 +7,8 @@
 
 <h1 class="mb-5 text-center">
     {{ topic.title }}
-
 </h1>
-{% for message in message_list%}
+{% for message in page_object.object_list%}
    {% include 'forumengine/includes/message_card_template.html' %}
 {% endfor %}
 

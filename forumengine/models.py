@@ -7,6 +7,12 @@ class ForumUser(User):
     user_id = models.AutoField(primary_key=True)
     rating = models.IntegerField(blank=False, null=False, default=0)
 
+    def __str__(self):
+        return self.username
+
+    def get_absolute_url(self):
+        return reverse('user_detail_url', kwargs={'id': self.id})
+
 
 class Category(models.Model):
     category_id = models.AutoField(primary_key=True)

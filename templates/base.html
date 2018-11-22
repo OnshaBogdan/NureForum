@@ -43,5 +43,35 @@
 {% block content %}
 if you see this, you've fucked up
 {% endblock %}
+{% block pagination %}
+{% if is_paginated %}
+            <nav aria-label="...">
+                <ul class="pagination pagination justify-content-center ">
+                    <li class="page-item {%if not prev_url %}disabled{% endif %}">
+                        <a class="page-link" href="{{ prev_url }}" tabindex="-1">Previous</a>
+                    </li>
+
+
+                    {% for n in page_object.paginator.page_range %}
+                    {% if page_object.number == n %}
+                    <li class="page-item active">
+                        <a class="page-link" href="#">{{n}} <span class="sr-only">{{n}}</span></a>
+                    </li>
+                    {% elif n > page_object.number|add:-3 and n < page_object.number|add:3 %}
+
+
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ n }}">{{n}}</a>
+                    </li>
+                    {% endif %}
+                    {% endfor %}
+
+                    <li class="page-item {%if not next_url %}disabled{%endif%}">
+                        <a class="page-link" href="{{ next_url }}">Next</a>
+                    </li>
+                </ul>
+            </nav>
+            {% endif %}
+{%endblock%}
 </body>
 </html>

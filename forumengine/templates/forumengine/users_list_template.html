@@ -11,7 +11,7 @@ Users list - {{ block.super }}
 <table class="table table-hover table-bordered w-75 user-rating-table">
     <thead class="thead-light">
     <tr>
-        <th scope="col">#</th>
+        <th scope="col" style="width: 12%">#</th>
         <th scope="col">Username</th>
         <th scope="col">Rate</th>
     </tr>
@@ -20,11 +20,11 @@ Users list - {{ block.super }}
     {% for index, user in users|order %}
     <tr>
         {% if index == 1%}
-            <th scope="col"> {{ index }}<i class="fas fa-trophy gold"></i></th>
+            <th scope="col"> {{ index }} <i class="fas fa-trophy gold fa-lg"></i></th>
         {% elif index == 2 %}
-            <th scope="col"> {{ index }}<i class="fas fa-trophy silver"></i></th>
+            <th scope="col"> {{ index }} <i class="fas fa-trophy silver fa-lg"></i></th>
         {% elif index == 3 %}
-            <th scope="col"> {{ index }}<i class="fas fa-trophy bronze"></i></th>
+            <th scope="col"> {{ index }} <i class="fas fa-trophy bronze fa-lg"></i></th>
         {% else%}
         <th scope="col">{{ index }}</th>
         {% endif %}

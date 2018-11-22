@@ -1,0 +1,40 @@
+{% extends 'base.html '%}
+
+{% block title %}
+{{ user.username }} - {{ block.super }}
+{% endblock %}
+
+{% block content %}
+
+<h1 class="mb-5 text-center">User info:</h1>
+<table class="table  table-bordered table-striped w-75 user-rating-table">
+    <tr>
+        <th>Username</th>
+        <th>{{user.username}}</th>
+    </tr>
+    <tr>
+        <th>Rating</th>
+        <th>{{user.rating}}</th>
+    </tr>
+    <tr>
+        <th>First name</th>
+        <th>{{user.first_name|title}}</th>
+    </tr>
+    <tr>
+        <th>Last name</th>
+        <th>{{user.last_name|title}}</th>
+    </tr>
+    {% if request.user.username == user.username %}
+        <tr>
+        <th>Email</th>
+        <th>{{user.email}}</th>
+    </tr>
+    {%endif%}
+</table>
+
+
+
+
+
+
+{% endblock %}
