@@ -6,6 +6,7 @@ from forumengine.utils import *
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.http import HttpResponse
+from django.contrib.auth import authenticate, login, logout
 
 
 class CategoryDetail(View):
@@ -78,3 +79,24 @@ def category_list(request):
     }
 
     return render(request, 'forumengine/index.html', context=content)
+
+
+def sign_in(request):
+    if request.method == 'GET':
+        return render(request, 'forumengine/user_sign_in_form.html')
+    else:
+        username = request.POST.get('username', False)
+        password = request.POST.get('password', False)
+
+        user = authenticate(username=username, password=password)
+
+        if user is not None:
+            login(request, user)
+            return redirect('category_list_view')
+        else:
+            return render(request, 'forumengine/user_sign_in_form.html')
+
+
+def logout_view(request):
+    logout(request)
+    return redirect('category_list_view')

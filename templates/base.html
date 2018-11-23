@@ -11,6 +11,10 @@
 
 
     <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css'%}">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+            integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+            crossorigin="anonymous"></script>
+
     <script src="{% static 'bootstrap/js/bootstrap.min.js'%}"></script>
 
     <link href="{% static 'fontawesome-free-5.5.0-web/css/all.css'%}" rel="stylesheet">
@@ -29,12 +33,29 @@
              class="d-inline-block align-top" alt="">
         Nure Forum
     </a>
+    {% if request.user.is_authenticated %}
+    <div class="btn-group ">
+        <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
+                aria-expanded="false">
+            {{ request.user.username}}
+        </button>
+        <div class="dropdown-menu dropdown-menu-right">
+            <a class="dropdown-item" href="#">Профиль</a>
+            <a class="dropdown-item" href="#">~~~~~</a>
+            <a class="dropdown-item" href="#">~~~~~</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="{% url 'logout_url' %}">Выйти</a>
+        </div>
+    </div>
+    {%else%}
     <div class="navbar-right navbar-icon-container">
         <ul class="list-inline navbar-icon-ul">
-            <li class="list-inline-item"><i class="fas fa-sign-in-alt  fa-lg"></i></li>
+            <li class="list-inline-item"><a class="link-unstyled" href="{% url 'user_sign_in_url' %}"><i class="fas fa-sign-in-alt  fa-lg"></i></a></li>
             <li class="list-inline-item"><i class="fas fa-user-plus  fa-lg"></i></li>
+
         </ul>
     </div>
+    {%endif%}
 
 </nav>
 {%block breadcrumb%}
@@ -45,33 +66,33 @@ if you see this, you've fucked up
 {% endblock %}
 {% block pagination %}
 {% if is_paginated %}
-            <nav aria-label="...">
-                <ul class="pagination pagination justify-content-center ">
-                    <li class="page-item {%if not prev_url %}disabled{% endif %}">
-                        <a class="page-link" href="{{ prev_url }}" tabindex="-1">Previous</a>
-                    </li>
+<nav aria-label="...">
+    <ul class="pagination pagination justify-content-center ">
+        <li class="page-item {%if not prev_url %}disabled{% endif %}">
+            <a class="page-link" href="{{ prev_url }}" tabindex="-1">Previous</a>
+        </li>
 
 
-                    {% for n in page_object.paginator.page_range %}
-                    {% if page_object.number == n %}
-                    <li class="page-item active">
-                        <a class="page-link" href="#">{{n}} <span class="sr-only">{{n}}</span></a>
-                    </li>
-                    {% elif n > page_object.number|add:-3 and n < page_object.number|add:3 %}
+        {% for n in page_object.paginator.page_range %}
+        {% if page_object.number == n %}
+        <li class="page-item active">
+            <a class="page-link" href="#">{{n}} <span class="sr-only">{{n}}</span></a>
+        </li>
+        {% elif n > page_object.number|add:-3 and n < page_object.number|add:3 %}
 
 
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ n }}">{{n}}</a>
-                    </li>
-                    {% endif %}
-                    {% endfor %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ n }}">{{n}}</a>
+        </li>
+        {% endif %}
+        {% endfor %}
 
-                    <li class="page-item {%if not next_url %}disabled{%endif%}">
-                        <a class="page-link" href="{{ next_url }}">Next</a>
-                    </li>
-                </ul>
-            </nav>
-            {% endif %}
+        <li class="page-item {%if not next_url %}disabled{%endif%}">
+            <a class="page-link" href="{{ next_url }}">Next</a>
+        </li>
+    </ul>
+</nav>
+{% endif %}
 {%endblock%}
 </body>
 </html>
