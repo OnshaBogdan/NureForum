@@ -8,6 +8,8 @@ Sign up - {{ block.super }}
 {% block content %}
 <form method="post" action=".">
     {% csrf_token%}
+    <div class="container mt-5 w-50">
+        <h4>Sing in:</h4>
   <div class="form-group">
     <label for="exampleInputEmail1">Username</label>
     <input type="text" name="username" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter username">
@@ -19,5 +21,6 @@ Sign up - {{ block.super }}
   </div>
 
   <button type="submit" class="btn btn-primary">Submit</button>
+    </div>
 </form>
 {% endblock%}

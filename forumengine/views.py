@@ -7,6 +7,7 @@ from django.core.paginator import Paginator
 from django.db.models import Q
 from django.http import HttpResponse
 from django.contrib.auth import authenticate, login, logout
+from .forms import *
 
 
 class CategoryDetail(View):
@@ -66,6 +67,24 @@ class UserDetail(View):
             'admin_object': obj,
             'detail': True}
                       )
+
+
+class UserCreate(ObjectCreateMixin, View):
+    model = ForumUser
+    model_form = UserForm
+    template = 'forumengine/user_sign_up_form.html'
+
+    def post(self, request):
+        bound_form = self.model_form(request.POST)
+
+        if bound_form.is_valid():
+            password = request.POST.get('password', False)
+            new_object = bound_form.save()
+            User.set_password(new_object, password)
+            new_object.save()
+
+            return redirect('category_list_view')
+        return render(request, self.template, context={'form': bound_form})
 
 
 def users_list(request):
