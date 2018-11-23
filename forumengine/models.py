@@ -62,3 +62,8 @@ class Message(models.Model):
     rating = models.IntegerField(blank=False, null=False, default=0)
     author = models.ForeignKey(ForumUser, on_delete=models.CASCADE, blank=False)
     topic = models.ForeignKey(Topic, on_delete=models.CASCADE, blank=False)
+
+    def __str__(self):
+        return self.author.__str__() + ' in ' + self.topic.__str__() + ' at ' + self.date_of_pub.ctime().__str__()
+
+

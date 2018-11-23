@@ -50,8 +50,8 @@
     {%else%}
     <div class="navbar-right navbar-icon-container">
         <ul class="list-inline navbar-icon-ul">
-            <li class="list-inline-item"><a class="link-unstyled" href="{% url 'user_sign_in_url' %}"><i class="fas fa-sign-in-alt  fa-lg"></i></a></li>
-            <li class="list-inline-item"><a class="link-unstyled" href="{% url 'user_sign_up_url' %}"><i class="fas fa-user-plus  fa-lg"></i></a></li>
+            <li class="list-inline-item" data-toggle="tooltip"  data-placement="bottom" title="Sign in"><a class="link-unstyled" href="{% url 'user_sign_in_url' %}"><i class="fas fa-sign-in-alt  fa-lg"></i></a></li>
+            <li class="list-inline-item" data-toggle="tooltip"  data-placement="bottom" title="Sign up"><a class="link-unstyled" href="{% url 'user_sign_up_url' %}"><i class="fas fa-user-plus  fa-lg"></i></a></li>
 
         </ul>
     </div>

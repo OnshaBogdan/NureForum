@@ -37,8 +37,18 @@ def messages_list(request, slug):
     next_url = '?page={}'.format(page.next_page_number()) if page.has_next() else ''
     is_paginated = page.has_other_pages()
 
+    if messages.count() != 0:
+        last_message = messages.last().date_of_pub
+        empty = False
+    else:
+        last_message = ''
+        empty = True
+
     context = {
         'topic': obj,
+        'messages_count': messages.count(),
+        'empty': empty,
+        'last_message': last_message,
         'page_object': page,
         'prev_url': prev_url,
         'next_url': next_url,
@@ -87,6 +97,9 @@ class UserCreate(ObjectCreateMixin, View):
         return render(request, self.template, context={'form': bound_form})
 
 
+
+
+
 def users_list(request):
     users = ForumUser.objects.order_by('-rating')[:10]
     return render(request, 'forumengine/users_list_template.html', context={'users': users})
@@ -119,3 +132,17 @@ def sign_in(request):
 def logout_view(request):
     logout(request)
     return redirect('category_list_view')
+
+
+def create_message(request):
+    if request.method == 'POST':
+        title = request.POST.get('title', False)
+        topic = Topic.objects.get(title=title)
+
+        message = Message()
+        message.author = ForumUser.objects.get(username=request.user.username)
+        message.body = request.POST.get('body', False)
+        message.topic = topic
+        message.save()
+
+        return redirect('topic_detail_view', slug=topic.slug)

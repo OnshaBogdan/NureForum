@@ -2,7 +2,7 @@
 {%block content%}
 <div class="card message-card">
   <div class="card-header">
-    {{ message.author }} at {{message.date_of_pub }}
+    <a href="{{message.author.get_absolute_url}}">{{ message.author }}</a> at {{message.date_of_pub }}
   </div>
   <div class="card-body">
     <p class="card-text">{{message.body}}</p>

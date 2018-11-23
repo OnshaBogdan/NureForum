@@ -10,5 +10,6 @@ urlpatterns = [
     path('users/', users_list, name='users_list_url'),
     path('sign-in/', sign_in, name='user_sign_in_url'),
     path('logout/', logout_view, name='logout_url'),
+    path('msg/create', create_message, name='create_message_url'),
 
 ]
