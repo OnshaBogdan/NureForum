@@ -1,16 +1,44 @@
 {%extends 'base.html'%}
-
-
-
+{% load static %}
 
 {% block content %}
 <div class="container-fluid title-container">
     <h2 class="mt-2 mb-3 text-center">
-    {{ category.title }}
+        {{ category.title }}
 </div>
 
 {% for topic in topic_list %}
 {% include 'forumengine/includes/topic_card_template.html' %}
 {% endfor %}
+{% if request.user.is_authenticated %}
+<div class="container w-50 mt-5">
+    <div class="row justify-content-center align-items-center">
+        <form class="col-12" action="{% url 'create_topic_url' %}" method="post">
+            {% csrf_token %}
+            <div class="row">
+                <div class="form-group row col-12">
+                    <label for="title" class="col-sm-2 col-form-label">Topic name:</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" name="title" id="title" placeholder="Let's overthrow the governance">
+                    </div>
+                </div>
 
+            </div>
+            <div class="row">
+                <div class="form-group row col-12">
+                    <label for="category_title" class="col-sm-2 col-form-label">In category:</label>
+                    <div class="col-sm-8">
+                        <input type="email" class="form-control" id="category_title" name="category_title"
+                               placeholder="{{ category.title }}" value="{{ category.title }}" readonly>
+                    </div>
+                    <div class="col">
+                        <button type="submit" class="btn btn-primary">Create</button>
+                    </div>
+                </div>
+
+            </div>
+        </form>
+    </div>
+</div>
+{% endif%}
 {% endblock%}

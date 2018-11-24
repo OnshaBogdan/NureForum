@@ -84,13 +84,14 @@ class TopicDetail(View):
             last_message = ''
             empty = True
         voted = {}
-        user = ForumUser.objects.get(username=request.user.username)
-        for i in messages:
-            try:
-                i.voted_users.get(username=user.username)
-                voted[i.message_id] = True
-            except forumengine.models.ForumUser.DoesNotExist:
-                voted[i.message_id] = False
+        if request.user.is_authenticated:
+            user = ForumUser.objects.get(username=request.user.username)
+            for i in messages:
+                try:
+                    i.voted_users.get(username=user.username)
+                    voted[i.message_id] = True
+                except forumengine.models.ForumUser.DoesNotExist:
+                    voted[i.message_id] = False
 
         context = {
             'topic': obj,
@@ -124,7 +125,7 @@ class VoteMessage(View):
             else:
                 message.vote(current_user, False)
         finally:
-            return redirect(reverse('topic_detail_view', kwargs={'slug':slug}) + '?page='+page)
+            return redirect(reverse('topic_detail_view', kwargs={'slug': slug}) + '?page=' + page)
 
 
 class UserDetail(View):
@@ -191,6 +192,11 @@ def logout_view(request):
 
 
 def create_message(request):
+    print(request.method)
+    print(request.method)
+    print(request.method)
+    print(request.method)
+    print(request.method)
     if request.method == 'POST':
         title = request.POST.get('title', False)
         topic = Topic.objects.get(title=title)
@@ -202,3 +208,21 @@ def create_message(request):
         message.save()
 
         return redirect('topic_detail_view', slug=topic.slug)
+
+
+def create_topic(request):
+    if request.method == 'POST':
+        title = request.POST.get('title', False)
+        category_title = request.POST.get('category_title', False)
+        cat = Category.objects.get(title=category_title)
+        user = ForumUser.objects.get(username=request.user.username)
+        print()
+        print(user.username)
+        print(cat.title)
+        print(title)
+        print()
+        obj = Topic(title=title, category=cat, author=user)
+        obj.save()
+
+        return redirect('topic_detail_view', slug=obj.slug)
+    return redirect('category_list_view')

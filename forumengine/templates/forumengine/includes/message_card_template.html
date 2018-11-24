@@ -14,27 +14,28 @@
                 <i class="fas fa-arrows-alt-v fa-lg"></i> <strong>{{message.rating}}</strong>
             </div>
             <div class="col-sm-4 text-right">
-
                 <form action="{% url 'vote_message_url' %}" method="post">
                     {% csrf_token %}
+
                     <input type="hidden" name="message_id" value="{{ message.message_id }}">
                     <input type="hidden" name="slug" value="{{ message.topic.slug}}">
                     <input type="hidden" name="page" value="{{ page_object.number }}">
                     <div class="btn-group" role="group" aria-label="Basic example">
+
                         {% if request.user.is_authenticated and not voted|hash:message.message_id%}
-                        <button type="submit" class="btn btn-success btn-sm" name="plus" value="1">
-                            &nbsp;<strong>+</strong>&nbsp
-                        </button>
-                        <button type="submit" class="btn btn-danger btn-sm" name="minus" value="1">
-                            &nbsp;<strong>–</strong>&nbsp
-                        </button>
-                        {%else%}
-                        <button type="submit" class="btn btn-success btn-sm" name="plus" value="1" disabled>
-                            &nbsp;<strong>+</strong>&nbsp
-                        </button>
-                        <button type="submit" class="btn btn-danger btn-sm" name="minus" value="1" disabled>
-                            &nbsp;<strong>–</strong>&nbsp
-                        </button>
+                            <button type="submit" class="btn btn-success btn-sm" name="plus" value="1">
+                                &nbsp;<strong>+</strong>&nbsp
+                            </button>
+                            <button type="submit" class="btn btn-danger btn-sm" name="minus" value="1">
+                                &nbsp;<strong>–</strong>&nbsp
+                            </button>
+                        {%elif request.user.is_authenticated and voted|hash:message.message_id %}
+                            <button type="submit" class="btn btn-success btn-sm" name="plus" value="1" disabled>
+                                &nbsp;<strong>+</strong>&nbsp
+                            </button>
+                            <button type="submit" class="btn btn-danger btn-sm" name="minus" value="1" disabled>
+                                &nbsp;<strong>–</strong>&nbsp
+                            </button>
                         {%endif%}
                     </div>
                 </form>

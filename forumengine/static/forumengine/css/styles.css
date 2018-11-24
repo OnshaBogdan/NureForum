@@ -40,3 +40,8 @@ border-top: 1px solid silver;
 border-bottom: 1px solid silver;
 background-color:#f9f9f9;
 }
+.topic_create_block{
+padding-top:25px;
+padding-bottom:25px;
+border-top: 1px solid silver;
+}
