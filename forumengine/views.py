@@ -90,7 +90,7 @@ class UserCreate(ObjectCreateMixin, View):
         if bound_form.is_valid():
             password = request.POST.get('password', False)
             new_object = bound_form.save()
-            User.set_password(new_object, password)
+            ForumUser.set_password(new_object, password)
             new_object.save()
 
             return redirect('category_list_view')

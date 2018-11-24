@@ -18,13 +18,17 @@ Users list - {{ block.super }}
     </thead>
     <tbody>
     {% for index, user in users|order %}
+        {% if request.user.username == user.username%}
+        <tr class="table-success">
+        {%else%}
     <tr>
+        {%endif%}
         {% if index == 1%}
             <th scope="col"> {{ index }} <i class="fas fa-trophy gold fa-lg"></i></th>
         {% elif index == 2 %}
-            <th scope="col"> {{ index }} <i class="fas fa-trophy silver fa-lg"></i></th>
+            <th scope="col"> {{ index }} <i class="fas fa-trophy silver "></i></th>
         {% elif index == 3 %}
-            <th scope="col"> {{ index }} <i class="fas fa-trophy bronze fa-lg"></i></th>
+            <th scope="col"> {{ index }} <i class="fas fa-trophy bronze fa-sm"></i></th>
         {% else%}
         <th scope="col">{{ index }}</th>
         {% endif %}

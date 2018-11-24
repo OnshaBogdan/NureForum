@@ -4,11 +4,11 @@
 
 
 {% block content %}
-
-<h1 class="mb-5 text-center">
+<div class="container-fluid title-container">
+    <h2 class="mt-2 mb-3 text-center">
     {{ category.title }}
+</div>
 
-</h1>
 {% for topic in topic_list %}
 {% include 'forumengine/includes/topic_card_template.html' %}
 {% endfor %}

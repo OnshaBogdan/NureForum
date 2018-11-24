@@ -17,6 +17,3 @@ class UserForm(forms.ModelForm):
             'email': forms.EmailInput(attrs=attrs),
             'password': forms.PasswordInput(attrs=attrs)
         }
-
-
-

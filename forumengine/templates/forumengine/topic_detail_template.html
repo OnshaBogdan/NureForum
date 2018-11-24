@@ -2,32 +2,36 @@
 
 
 {% block content %}
-
-<h1 class="mb-1 text-center">
-    {{ topic.title }}
-</h1>
-{% if not empty %}
-<h3 class="mb-5 text-center">{{messages_count}} messages, last at {{last_message}}</h3>
-{%else%}
-<h3 class="mb-5 text-center">There is no messages yet</h3>
-{%endif%}
+<div class="container-fluid title-container">
+    <h1 class="mb-1 text-center">
+        {{ topic.title }}
+    </h1>
+    {% if not empty %}
+    <h3 class="mb-1 text-center">{{messages_count}} messages, last at {{last_message}}</h3>
+    {%else%}
+    <h3 class="mb-1 text-center">There is no messages yet</h3>
+    {%endif%}
+    <h4 class="mb-1 text-center">Created by <a href="{{topic.author.get_absolute_url}}">{{topic.author}}</a></h4>
+</div>
 {% for message in page_object.object_list%}
-{% include 'forumengine/includes/message_card_template.html' %}
+<div class="container w-75">
+    {% include 'forumengine/includes/message_card_template.html' %}
+</div>
 {% endfor %}
 
 
 {% if request.user.is_authenticated %}
-    <form action="{% url 'create_message_url' %}" method="post">
-        {%csrf_token%}
-        <div class="container mt-2 mb-4">
+<form action="{% url 'create_message_url' %}" method="post">
+    {%csrf_token%}
+    <div class="container mt-2 mb-4">
 
-            <label for="body"><strong>Write a message:</strong></label>
-            <textarea class="form-control" name="body" rows="3"></textarea>
-            <input class="form-control"  type="text" value="{{topic.title}}" readonly>
-            <input type="hidden" name="title" value="{{ topic.title }}">
-            <button type="submit" class="btn btn-primary mt-4">Create</button>
-        </div>
+        <label for="body"><strong>Write a message:</strong></label>
+        <textarea class="form-control" name="body" rows="3"></textarea>
+        <input class="form-control" type="text" value="{{topic.title}}" readonly>
+        <input type="hidden" name="title" value="{{ topic.title }}">
+        <button type="submit" class="btn btn-primary mt-4">Create</button>
+    </div>
 
-    </form>
+</form>
 {% endif %}
 {% endblock%}
