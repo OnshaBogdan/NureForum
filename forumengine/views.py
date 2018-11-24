@@ -21,51 +21,110 @@ class CategoryDetail(View):
         return render(request, 'forumengine/category_detail_template.html', context=context)
 
 
-def messages_list(request, slug):
-    search_query = request.GET.get('search', '')
-    page_number = request.GET.get('page', 1)
-    obj = get_object_or_404(Topic, slug__iexact=slug)
+class TopicDetail(View):
+    def get(self, request, slug):
+        search_query = request.GET.get('search', '')
+        page_number = request.GET.get('page', 1)
+        obj = get_object_or_404(Topic, slug__iexact=slug)
 
-    if search_query:
-        messages = Message.objects.filter(Q(title__icontains=search_query) | Q(body__icontains=search_query))
-    else:
-        messages = Message.objects.filter(topic=obj)
-    paginator = Paginator(messages, 5)
+        if search_query:
+            messages = Message.objects.filter(Q(title__icontains=search_query) | Q(body__icontains=search_query))
+        else:
+            messages = Message.objects.filter(topic=obj)
+        paginator = Paginator(messages, 5)
 
-    page = paginator.get_page(page_number)
-    prev_url = '?page={}'.format(page.previous_page_number()) if page.has_previous() else ''
-    next_url = '?page={}'.format(page.next_page_number()) if page.has_next() else ''
-    is_paginated = page.has_other_pages()
+        page = paginator.get_page(page_number)
+        prev_url = '?page={}'.format(page.previous_page_number()) if page.has_previous() else ''
+        next_url = '?page={}'.format(page.next_page_number()) if page.has_next() else ''
+        is_paginated = page.has_other_pages()
 
-    if messages.count() != 0:
-        last_message = messages.last().date_of_pub
-        empty = False
-    else:
-        last_message = ''
-        empty = True
+        if messages.count() != 0:
+            last_message = messages.last().date_of_pub
+            empty = False
+        else:
+            last_message = ''
+            empty = True
 
-    context = {
-        'topic': obj,
-        'messages_count': messages.count(),
-        'empty': empty,
-        'last_message': last_message,
-        'page_object': page,
-        'prev_url': prev_url,
-        'next_url': next_url,
-        'is_paginated': is_paginated
-    }
+        context = {
+            'topic': obj,
+            'messages_count': messages.count(),
+            'empty': empty,
+            'last_message': last_message,
+            'page_object': page,
+            'prev_url': prev_url,
+            'next_url': next_url,
+            'is_paginated': is_paginated
+        }
 
-    return render(request, 'forumengine/topic_detail_template.html', context=context)
+        return render(request, 'forumengine/topic_detail_template.html', context=context)
 
 
 class TopicDetail(View):
 
     def get(self, request, slug):
+        search_query = request.GET.get('search', '')
+        page_number = request.GET.get('page', 1)
         obj = get_object_or_404(Topic, slug__iexact=slug)
-        context = {'topic': obj,
-                   'message_list': Message.objects.filter(topic=obj)
-                   }
+
+        if search_query:
+            messages = Message.objects.filter(Q(title__icontains=search_query) | Q(body__icontains=search_query))
+        else:
+            messages = Message.objects.filter(topic=obj)
+        paginator = Paginator(messages, 5)
+
+        page = paginator.get_page(page_number)
+        prev_url = '?page={}'.format(page.previous_page_number()) if page.has_previous() else ''
+        next_url = '?page={}'.format(page.next_page_number()) if page.has_next() else ''
+        is_paginated = page.has_other_pages()
+
+        if messages.count() != 0:
+            last_message = messages.last().date_of_pub
+            empty = False
+        else:
+            last_message = ''
+            empty = True
+        voted = {}
+        user = ForumUser.objects.get(username=request.user.username)
+        for i in messages:
+            try:
+                i.voted_users.get(username=user.username)
+                voted[i.message_id] = True
+            except forumengine.models.ForumUser.DoesNotExist:
+                voted[i.message_id] = False
+
+        context = {
+            'topic': obj,
+            'messages_count': messages.count(),
+            'empty': empty,
+            'last_message': last_message,
+            'page_object': page,
+            'prev_url': prev_url,
+            'next_url': next_url,
+            'is_paginated': is_paginated,
+            'voted': voted
+        }
+
         return render(request, 'forumengine/topic_detail_template.html', context=context)
+
+
+class VoteMessage(View):
+
+    def post(self, request):
+        slug = request.POST.get('slug', False)
+        page = request.POST.get('page', 1)
+        message_id = request.POST.get('message_id')
+        message = Message.objects.get(message_id=message_id)
+        current_user = ForumUser.objects.get(username=request.user.username)
+
+        try:
+            message.voted_users.get(username=current_user.username)
+        except forumengine.models.ForumUser.DoesNotExist:
+            if request.POST.get('plus'):
+                message.vote(current_user, True)
+            else:
+                message.vote(current_user, False)
+        finally:
+            return redirect(reverse('topic_detail_view', kwargs={'slug':slug}) + '?page='+page)
 
 
 class UserDetail(View):
@@ -95,9 +154,6 @@ class UserCreate(ObjectCreateMixin, View):
 
             return redirect('category_list_view')
         return render(request, self.template, context={'form': bound_form})
-
-
-
 
 
 def users_list(request):

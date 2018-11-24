@@ -62,8 +62,23 @@ class Message(models.Model):
     rating = models.IntegerField(blank=False, null=False, default=0)
     author = models.ForeignKey(ForumUser, on_delete=models.CASCADE, blank=False)
     topic = models.ForeignKey(Topic, on_delete=models.CASCADE, blank=False)
+    voted_users = models.ManyToManyField(ForumUser, blank=True, default=None, related_name='voted_users')
 
     def __str__(self):
         return self.author.__str__() + ' in ' + self.topic.__str__() + ' at ' + self.date_of_pub.ctime().__str__()
+
+    def vote(self, user, isPlus):
+        if isPlus:
+            self.rating += 1
+            self.author.rating += 1
+            self.topic.rating +=1
+        else:
+            self.rating -= 1
+            self.author.rating -= 1
+            self.topic.rating -= 1
+        self.voted_users.add(user)
+        self.topic.save()
+        self.author.save()
+        self.save()
 
 
