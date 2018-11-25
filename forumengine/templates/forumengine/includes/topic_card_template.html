@@ -7,19 +7,23 @@
 {%block content%}
 <div class="card w-75 topic-card">
     <div class="card-header">
-        <div class="justify-content-end">
+        <div class="container row">
             <div class="col-10">
                 <h5><a href="{{topic.get_absolute_url}}">{{ topic.title }}</a></h5>
             </div>
-            <div class="col-2">
-                <div class=""><i class="fas fa-arrows-alt-v"></i> {{topic.rating}}</div>
+            <div class="col">
+                {% if topic.rating >= 0 %}
+                <i class="fas fa-thumbs-up  fa-lg"></i> <strong>{{topic.rating}}</strong>
+                {%else%}
+                <i class="fas fa-thumbs-up  fa-rotate-180 fa-lg"></i> <strong>{{topic.rating}}</strong>
+                {%endif%}
+
             </div>
         </div>
     </div>
     <div class="card-body">
         <p class="card-text">Created by {{topic.author}} at {{topic.date_of_pub }}</p>
     </div>
-    <div class="card-footer"><i class="fas fa-arrows-alt-v"></i> {{topic.rating}}</div>
 
 </div>
 {%endblock%}

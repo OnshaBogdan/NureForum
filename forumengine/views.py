@@ -8,6 +8,7 @@ from django.db.models import Q
 from django.http import HttpResponse
 from django.contrib.auth import authenticate, login, logout
 from .forms import *
+import datetime
 
 
 class CategoryDetail(View):
@@ -128,15 +129,51 @@ class VoteMessage(View):
             return redirect(reverse('topic_detail_view', kwargs={'slug': slug}) + '?page=' + page)
 
 
-class UserDetail(View):
+class BestMessages(View):
 
-    def get(self, request, id):
-        obj = get_object_or_404(ForumUser, id=id)
-        return render(request, 'forumengine/user_detail_template.html', context={
-            'user': obj,
-            'admin_object': obj,
-            'detail': True}
-                      )
+    def post(self, request, time_range='2018-01-01'):
+        form = FilterForm(request.POST)
+
+        if form.is_valid():
+            username = form.cleaned_data['username']
+            time_range = form.cleaned_data['time_range']
+            lowest_rating = form.cleaned_data['lowest_rating']
+            highest_rating = form.cleaned_data['highest_rating']
+            date_now = datetime.datetime.now().date()
+            try:
+                user = ForumUser.objects.get(username=username)
+            except forumengine.models.ForumUser.DoesNotExist:
+                user = None
+            if user is not None:
+                messages = Message.objects.filter(author=user).order_by('-rating')
+                for i in messages:
+                    print(i.body)
+            else:
+                messages = Message.objects.filter(date_of_pub__range=(time_range, date_now)).order_by('-rating')
+            context = {
+                'message_list': messages,
+                'user': user,
+                'form': form
+            }
+            return render(request, 'forumengine/best_messages_template.html', context=context)
+
+        return render(request, self.template, context={})
+
+    def get(self, request, time_range='2018-01-01'):
+        form = FilterForm()
+        date_now = datetime.datetime.now().date()
+
+        messages = Message.objects.filter(date_of_pub__range=(time_range, date_now)).order_by('-rating')
+        if request.user.is_authenticated:
+            user = ForumUser.objects.get(username=request.user.username)
+        else:
+            user = None
+        context = {
+            'message_list': messages,
+            'user': user,
+            'form':form
+        }
+        return render(request, 'forumengine/best_messages_template.html', context=context)
 
 
 class UserCreate(ObjectCreateMixin, View):
@@ -155,6 +192,17 @@ class UserCreate(ObjectCreateMixin, View):
 
             return redirect('category_list_view')
         return render(request, self.template, context={'form': bound_form})
+
+
+class UserDetail(View):
+
+    def get(self, request, id):
+        obj = get_object_or_404(ForumUser, id=id)
+        return render(request, 'forumengine/user_detail_template.html', context={
+            'user': obj,
+            'admin_object': obj,
+            'detail': True}
+                      )
 
 
 def users_list(request):
@@ -192,14 +240,9 @@ def logout_view(request):
 
 
 def create_message(request):
-    print(request.method)
-    print(request.method)
-    print(request.method)
-    print(request.method)
-    print(request.method)
     if request.method == 'POST':
-        title = request.POST.get('title', False)
-        topic = Topic.objects.get(title=title)
+        topic_id = request.POST.get('topic_id', False)
+        topic = Topic.objects.get(topic_id=topic_id)
 
         message = Message()
         message.author = ForumUser.objects.get(username=request.user.username)
@@ -213,14 +256,9 @@ def create_message(request):
 def create_topic(request):
     if request.method == 'POST':
         title = request.POST.get('title', False)
-        category_title = request.POST.get('category_title', False)
-        cat = Category.objects.get(title=category_title)
+        category_id = request.POST.get('category_id', False)
+        cat = Category.objects.get(category_id=category_id)
         user = ForumUser.objects.get(username=request.user.username)
-        print()
-        print(user.username)
-        print(cat.title)
-        print(title)
-        print()
         obj = Topic(title=title, category=cat, author=user)
         obj.save()
 

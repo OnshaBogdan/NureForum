@@ -1,0 +1,52 @@
+{%extends 'base.html'%}
+{% load users_list_extras %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="container">
+        <h5 class="text-center">filtering</h5>
+    </div>
+    <div class="container-fluid">
+        <form action="{% url 'best_messages_url' %}" method="post">
+            {% csrf_token %}
+            {{ form }}
+            <button type="submit" class="btn btn-primary mt-3">Apply</button>
+        </form>
+
+    </div>
+</div>
+<table class="table">
+    <thead class="thead-light">
+    <tr>
+        <th scope="col">#</th>
+        <th scope="col">Message</th>
+        <th scope="col">Author</th>
+        <th scope="col">Topic</th>
+        <th scope="col">Rating</th>
+        <th scope="col">Date</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for index, message in message_list|order %}
+    <tr>
+        {% if index == 1%}
+        <th scope="col"> {{ index }} <i class="fas fa-trophy gold fa-lg"></i></th>
+        {% elif index == 2 %}
+        <th scope="col"> {{ index }} <i class="fas fa-trophy silver "></i></th>
+        {% elif index == 3 %}
+        <th scope="col"> {{ index }} <i class="fas fa-trophy bronze fa-sm"></i></th>
+        {% else%}
+        <th scope="col">{{ index }}</th>
+        {% endif %}
+        <th scope="col">{{message.body|truncatewords:5}}</th>
+        <th scope="col"><a href={{message.author.get_absolute_url}}>{{message.author.username}}</a></th>
+        <th scope="col"><a href={{message.topic.get_absolute_url}}>{{message.topic.title}}</a></th>
+        <th scope="col">{{message.rating}}</th>
+        <th scope="col">{{message.date_of_pub.month}}/{{message.date_of_pub.day}}</th>
+    </tr>
+    {% endfor %}
+
+    </tbody>
+</table>
+
+{%endblock%}

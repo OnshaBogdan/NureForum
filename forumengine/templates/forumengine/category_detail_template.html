@@ -28,8 +28,9 @@
                 <div class="form-group row col-12">
                     <label for="category_title" class="col-sm-2 col-form-label">In category:</label>
                     <div class="col-sm-8">
-                        <input type="email" class="form-control" id="category_title" name="category_title"
+                        <input type="email" class="form-control" id="category_title"
                                placeholder="{{ category.title }}" value="{{ category.title }}" readonly>
+                        <input type="hidden" name="category_id" value="{{ category.category_id }}">
                     </div>
                     <div class="col">
                         <button type="submit" class="btn btn-primary">Create</button>

@@ -13,5 +13,6 @@ urlpatterns = [
     path('logout/', logout_view, name='logout_url'),
     path('msg/create/', create_message, name='create_message_url'),
     path('msg/vote/', VoteMessage.as_view(), name='vote_message_url'),
+    path('msg/best/', BestMessages.as_view(), name='best_messages_url'),
 
 ]
