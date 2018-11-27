@@ -131,33 +131,64 @@ class VoteMessage(View):
 
 class BestMessages(View):
 
-    def post(self, request, time_range='2018-01-01'):
+    def post(self, request):
+        def time_range_to_date(time_range):
+
+            if time_range == 'Daily':
+                days_sub = 1
+            elif time_range == 'Weekly':
+                days_sub = 7
+            elif time_range == 'Monthly':
+                days_sub = 28
+            else:
+                days_sub = 1000
+            date = datetime.datetime.now() + datetime.timedelta(days_sub * -1)
+
+            return date
+
+        def message_filter(user, time_range, lowest, highest):
+            date_now = datetime.datetime.now()
+            messages = Message.objects.all()
+            if lowest is None:
+                lowest = -100
+            if highest is None:
+                highest = 1000
+            if user is not None:
+                messages = messages.filter(author=user)
+            messages = messages.filter(date_of_pub__range=(time_range, date_now))
+
+            if lowest < highest:
+                messages = messages.filter(rating__range=(lowest, highest))
+            messages = messages.order_by('-rating')
+            return messages
+
         form = FilterForm(request.POST)
 
         if form.is_valid():
             username = form.cleaned_data['username']
-            time_range = form.cleaned_data['time_range']
+            time_range = time_range_to_date(form.cleaned_data['time_range'])
             lowest_rating = form.cleaned_data['lowest_rating']
             highest_rating = form.cleaned_data['highest_rating']
-            date_now = datetime.datetime.now().date()
+            if lowest_rating is None:
+                lowest_rating = -100
+            if highest_rating is None:
+                highest_rating = 1000
+
             try:
                 user = ForumUser.objects.get(username=username)
             except forumengine.models.ForumUser.DoesNotExist:
                 user = None
-            if user is not None:
-                messages = Message.objects.filter(author=user).order_by('-rating')
-                for i in messages:
-                    print(i.body)
-            else:
-                messages = Message.objects.filter(date_of_pub__range=(time_range, date_now)).order_by('-rating')
+            messages = message_filter(user, time_range, lowest_rating, highest_rating)
+
             context = {
                 'message_list': messages,
                 'user': user,
                 'form': form
             }
+
             return render(request, 'forumengine/best_messages_template.html', context=context)
 
-        return render(request, self.template, context={})
+        return render(request, 'forumengine/best_messages_template.html', context={})
 
     def get(self, request, time_range='2018-01-01'):
         form = FilterForm()
@@ -171,7 +202,7 @@ class BestMessages(View):
         context = {
             'message_list': messages,
             'user': user,
-            'form':form
+            'form': form
         }
         return render(request, 'forumengine/best_messages_template.html', context=context)
 
