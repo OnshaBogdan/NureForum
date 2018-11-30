@@ -2,7 +2,16 @@
 {%block content%}
 <div class="card message-card">
     <div class="card-header">
-        <a href="{{message.author.get_absolute_url}}">{{ message.author }}</a> at {{message.date_of_pub }}
+        <div class="row">
+            <div class="col-6">
+                <a href="{{message.author.get_absolute_url}}">{{ message.author }}</a> at {{message.date_of_pub }}
+            </div>
+            {% if message.author == user or user.is_staff %}
+            <div class="col text-right">
+                <a class="link-unstyled" href="{{message.get_update_url}}"><i class="fas fa-edit fa-lg"></i></a>
+            </div>
+            {%endif%}
+        </div>
     </div>
     <div class="card-body">
         <p class="card-text">{{message.body}}</p>
@@ -26,20 +35,20 @@
                     <input type="hidden" name="page" value="{{ page_object.number }}">
                     <div class="btn-group" role="group" aria-label="Basic example">
 
-                        {% if request.user.is_authenticated and not voted|hash:message.message_id%}
-                            <button type="submit" class="btn btn-success btn-sm" name="plus" value="1">
-                                &nbsp;<strong>+</strong>&nbsp
-                            </button>
-                            <button type="submit" class="btn btn-danger btn-sm" name="minus" value="1">
-                                &nbsp;<strong>–</strong>&nbsp
-                            </button>
+                        {% if user and not voted|hash:message.message_id%}
+                        <button type="submit" class="btn btn-success btn-sm" name="plus" value="1">
+                            &nbsp;<strong>+</strong>&nbsp
+                        </button>
+                        <button type="submit" class="btn btn-danger btn-sm" name="minus" value="1">
+                            &nbsp;<strong>–</strong>&nbsp
+                        </button>
                         {%elif request.user.is_authenticated and voted|hash:message.message_id %}
-                            <button type="submit" class="btn btn-success btn-sm" name="plus" value="1" disabled>
-                                &nbsp;<strong>+</strong>&nbsp
-                            </button>
-                            <button type="submit" class="btn btn-danger btn-sm" name="minus" value="1" disabled>
-                                &nbsp;<strong>–</strong>&nbsp
-                            </button>
+                        <button type="submit" class="btn btn-success btn-sm" name="plus" value="1" disabled>
+                            &nbsp;<strong>+</strong>&nbsp
+                        </button>
+                        <button type="submit" class="btn btn-danger btn-sm" name="minus" value="1" disabled>
+                            &nbsp;<strong>–</strong>&nbsp
+                        </button>
                         {%endif%}
                     </div>
                 </form>

@@ -5,7 +5,7 @@ from forumengine.models import *
 from forumengine.utils import *
 from django.core.paginator import Paginator
 from django.db.models import Q
-from django.http import HttpResponse
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import authenticate, login, logout
 from .forms import *
 import datetime
@@ -54,58 +54,20 @@ class TopicDetail(View):
             'page_object': page,
             'prev_url': prev_url,
             'next_url': next_url,
-            'is_paginated': is_paginated
+            'is_paginated': is_paginated,
+            'user': None
         }
-
-        return render(request, 'forumengine/topic_detail_template.html', context=context)
-
-
-class TopicDetail(View):
-
-    def get(self, request, slug):
-        search_query = request.GET.get('search', '')
-        page_number = request.GET.get('page', 1)
-        obj = get_object_or_404(Topic, slug__iexact=slug)
-
-        if search_query:
-            messages = Message.objects.filter(Q(title__icontains=search_query) | Q(body__icontains=search_query))
-        else:
-            messages = Message.objects.filter(topic=obj)
-        paginator = Paginator(messages, 5)
-
-        page = paginator.get_page(page_number)
-        prev_url = '?page={}'.format(page.previous_page_number()) if page.has_previous() else ''
-        next_url = '?page={}'.format(page.next_page_number()) if page.has_next() else ''
-        is_paginated = page.has_other_pages()
-
-        if messages.count() != 0:
-            last_message = messages.last().date_of_pub
-            empty = False
-        else:
-            last_message = ''
-            empty = True
-        voted = {}
         if request.user.is_authenticated:
             user = ForumUser.objects.get(username=request.user.username)
+            context['user'] = user
+            voted = {}
             for i in messages:
                 try:
                     i.voted_users.get(username=user.username)
                     voted[i.message_id] = True
                 except forumengine.models.ForumUser.DoesNotExist:
                     voted[i.message_id] = False
-
-        context = {
-            'topic': obj,
-            'messages_count': messages.count(),
-            'empty': empty,
-            'last_message': last_message,
-            'page_object': page,
-            'prev_url': prev_url,
-            'next_url': next_url,
-            'is_paginated': is_paginated,
-            'voted': voted
-        }
-
+            context['voted'] = voted
         return render(request, 'forumengine/topic_detail_template.html', context=context)
 
 
@@ -236,17 +198,54 @@ class UserDetail(View):
                       )
 
 
+class MessageUpdate(LoginRequiredMixin, View):
+    model = Message
+    model_form = MessageForm
+    template = 'forumengine/message_update_form.html'
+    raise_exception = True
+
+    def get(self, request, message_id):
+        user = ForumUser.objects.get(username=request.user.username)
+        message = Message.objects.get(message_id=message_id)
+        bound_form = self.model_form(instance=message)
+
+        if message.author == user or user.is_staff:
+            return render(request, self.template, context={'form': bound_form, 'message': message})
+
+        else:
+            return redirect('topic_detail_view', slug=message.topic.slug)
+
+    def post(self, request, message_id):
+        message = self.model.objects.get(message_id=message_id)
+        bound_form = self.model_form(request.POST, instance=message)
+
+        if bound_form.is_valid():
+            new_obj = bound_form.save()
+            return redirect(new_obj.topic)
+        return render(request, self.template, context={'form': bound_form, self.model.__name__.lower(): message})
+
+
 def users_list(request):
     users = ForumUser.objects.order_by('-rating')[:10]
-    return render(request, 'forumengine/users_list_template.html', context={'users': users})
+    context = {
+        'users': users,
+        'user': None
+    }
+    if request.user.is_authenticated:
+        user = ForumUser.objects.get(username=request.user.username)
+        context['user'] = user
+    return render(request, 'forumengine/users_list_template.html', context=context)
 
 
 def category_list(request):
-    content = {
+    context = {
         'category_list': Category.objects.all(),
+        'user': None
     }
-
-    return render(request, 'forumengine/index.html', context=content)
+    if request.user.is_authenticated:
+        user = ForumUser.objects.get(username=request.user.username)
+        context['user'] = user
+    return render(request, 'forumengine/index.html', context=context)
 
 
 def sign_in(request):

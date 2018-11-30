@@ -1,0 +1,30 @@
+{% extends 'base.html'%}
+
+{% block title %}
+Edit Post {{ post.title }}- {{ block.super }}
+{% endblock %}
+
+{% block content %}
+<div class="container w-50" style="margin-left:25%;">
+    <form action="{{ message.get_update_url }}" method="post">
+        {% csrf_token %}
+
+        {% for field in form %}
+        <div class="form-group w-100">
+            {% if field.errors%}
+            <div class="alert alert-danger">
+                {{ field.errors }}
+            </div>
+            {% endif %}
+
+            {{ field.label}}
+            {{ field }}
+        </div>
+        {% endfor%}
+
+
+        <button type="submit" class="btn btn-primary">Edit Message</button>
+    </form>
+</div>
+
+{% endblock %}

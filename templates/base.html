@@ -2,6 +2,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    {% block head %}
     <meta charset="UTF-8">
     <title>
         {% block title %}
@@ -11,16 +12,13 @@
 
 
     <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css'%}">
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
-            integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
-            crossorigin="anonymous"></script>
 
-    <script src="{% static 'bootstrap/js/bootstrap.min.js'%}"></script>
+
 
     <link href="{% static 'fontawesome-free-5.5.0-web/css/all.css'%}" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'forumengine/css/styles.css'%}">
 
-
+    {% endblock%}
     {% block extrahead %}
     {% endblock %}
 </head>
@@ -28,59 +26,63 @@
 {%block header%}
 <!-- Image and text -->
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
- <a class="navbar-brand" href="{% url 'category_list_view'%}">
+    <a class="navbar-brand" href="{% url 'category_list_view'%}">
         <img src="{% static 'forumengine/images/nure_logo.png'%}" width="30" height="30"
              class="d-inline-block align-top" alt="">
         Nure Forum
     </a>
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
 
-  <div class="collapse navbar-collapse" id="navbarSupportedContent">
-    <ul class="navbar-nav mr-auto">
-      <li class="nav-item active">
-        <a class="nav-link" href="{% url 'category_list_view'%}">Home <span class="sr-only">(current)</span></a>
-      </li>
-      <li class="nav-item active">
-        <a class="nav-link" href="{% url 'users_list_url'%}">Top Users</a>
-      </li>
-      <li class="nav-item dropdown active">
-        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          Top
-        </a>
-        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-          <a class="dropdown-item" href="#">Hot Topics</a>
-          <a class="dropdown-item" href="{% url 'best_messages_url'%}">Best Messages</a>
-        </div>
-      </li>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href="{% url 'category_list_view'%}">Home <span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="{% url 'users_list_url'%}">Top Users</a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="#">Hot Topics</a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="{% url 'best_messages_url'%}">Best Messages</a>
+            </li>
 
-    </ul>
-   {% if request.user.is_authenticated %}
-    <div class="btn-group ">
-        <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
-                aria-expanded="false">
-            {{ request.user.username}}
-        </button>
-        <div class="dropdown-menu dropdown-menu-right">
-            <a class="dropdown-item" href="#">Профиль</a>
-            <a class="dropdown-item" href="#">~~~~~</a>
-            <a class="dropdown-item" href="#">~~~~~</a>
-            <div class="dropdown-divider"></div>
-            <a class="dropdown-item" href="{% url 'logout_url' %}">Выйти</a>
-        </div>
-    </div>
-    {%else%}
-    <div class="navbar-right navbar-icon-container">
-        <ul class="list-inline navbar-icon-ul">
-            <li class="list-inline-item" data-toggle="tooltip"  data-placement="bottom" title="Sign in"><a class="link-unstyled" href="{% url 'user_sign_in_url' %}"><i class="fas fa-sign-in-alt  fa-lg"></i></a></li>
-            <li class="list-inline-item" data-toggle="tooltip"  data-placement="bottom" title="Sign up"><a class="link-unstyled" href="{% url 'user_sign_up_url' %}"><i class="fas fa-user-plus  fa-lg"></i></a></li>
 
         </ul>
-    </div>
-    {%endif%}
+        {% if request.user.is_authenticated %}
+        <div class="btn-group ">
+            <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
+                    aria-expanded="false">
+                {{ request.user.username}}
+            </button>
+            <div class="dropdown-menu dropdown-menu-right">
+                <a class="dropdown-item" href={{user.get_absolute_url}}>My profile</a>
 
-  </div>
+                <a class="dropdown-item" href="#">~~~~~</a>
+                <a class="dropdown-item" href="#">~~~~~</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="{% url 'logout_url' %}">Выйти</a>
+            </div>
+        </div>
+        {%else%}
+        <div class="navbar-right navbar-icon-container">
+            <ul class="list-inline navbar-icon-ul">
+                <li class="list-inline-item" data-toggle="tooltip" data-placement="bottom" title="Sign in"><a
+                        class="link-unstyled" href="{% url 'user_sign_in_url' %}"><i
+                        class="fas fa-sign-in-alt  fa-lg"></i></a></li>
+                <li class="list-inline-item" data-toggle="tooltip" data-placement="bottom" title="Sign up"><a
+                        class="link-unstyled" href="{% url 'user_sign_up_url' %}"><i
+                        class="fas fa-user-plus  fa-lg"></i></a></li>
+
+            </ul>
+        </div>
+        {%endif%}
+
+    </div>
 </nav>
 
 {%block breadcrumb%}
@@ -119,5 +121,16 @@ if you see this, you've fucked up
 </nav>
 {% endif %}
 {%endblock%}
+{% block asd%}
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+        integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"
+        integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+        crossorigin="anonymous"></script>
+{% endblock%}
 </body>
 </html>

@@ -1,7 +1,7 @@
 from django import forms
 from .models import *
 from django.core.exceptions import ValidationError
-
+from django.contrib.admin import widgets
 
 class UserForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput())
@@ -32,13 +32,26 @@ class FilterForm(forms.Form):
         widget=forms.Select(choices=CHOICES, attrs={'class': 'form-control', 'name': 'time_range'})
     )
     lowest_rating = forms.IntegerField(
-        label='from',
+        label='Rating from',
         widget=forms.NumberInput({'class': 'form-control', 'name': 'lowest_rating'}),
         required=False
 
     )
     highest_rating = forms.IntegerField(
-        label='to',
+        label='Rating to',
         widget=forms.NumberInput({'class': 'form-control', 'name': 'highest_rating'}),
         required=False
     )
+
+
+class MessageForm(forms.ModelForm):
+    class Meta:
+        model = Message
+        fields = ['body', 'rating']
+        vidgets = {
+            'body': forms.Textarea(attrs={'class': 'form-control w-100'}),
+            'rating': forms.NumberInput(attrs={'class': 'form-control'}),
+        }
+
+
+

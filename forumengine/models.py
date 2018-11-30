@@ -81,4 +81,5 @@ class Message(models.Model):
         self.author.save()
         self.save()
 
-
+    def get_update_url(self):
+        return reverse('message_update_url', kwargs={'message_id': self.message_id})
