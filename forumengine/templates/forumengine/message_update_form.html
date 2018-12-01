@@ -1,11 +1,12 @@
 {% extends 'base.html'%}
+{% load static %}
 
 {% block title %}
 Edit Post {{ post.title }}- {{ block.super }}
 {% endblock %}
 
 {% block content %}
-<div class="container w-50" style="margin-left:25%;">
+<div class="container w-50 mt-5" style="margin-left:25%;">
     <form action="{{ message.get_update_url }}" method="post">
         {% csrf_token %}
 
@@ -16,12 +17,17 @@ Edit Post {{ post.title }}- {{ block.super }}
                 {{ field.errors }}
             </div>
             {% endif %}
+            <div class="form-group">
+                {{ field.label}}
 
-            {{ field.label}}
-            {{ field }}
+                {{ field }}
+            </div>
         </div>
         {% endfor%}
-
+        <div class="gorm-group">
+            <p>Topic : {{message.topic.title}}</p>
+            <p>Rating : {{message.rating}}</p>
+        </div>
 
         <button type="submit" class="btn btn-primary">Edit Message</button>
     </form>

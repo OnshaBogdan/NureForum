@@ -3,6 +3,7 @@ from .models import *
 from django.core.exceptions import ValidationError
 from django.contrib.admin import widgets
 
+
 class UserForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput())
 
@@ -47,10 +48,9 @@ class FilterForm(forms.Form):
 class MessageForm(forms.ModelForm):
     class Meta:
         model = Message
-        fields = ['body', 'rating']
+        fields = ['body']
         vidgets = {
-            'body': forms.Textarea(attrs={'class': 'form-control w-100'}),
-            'rating': forms.NumberInput(attrs={'class': 'form-control'}),
+            'body': forms.Textarea(attrs={'class': 'form-control'}),
         }
 
 

@@ -25,10 +25,12 @@
         <th>{{user.last_name|title}}</th>
     </tr>
     {% if request.user.username == user.username %}
+    <tr>
         <tr>
         <th>Email</th>
         <th>{{user.email}}</th>
     </tr>
+
     {%endif%}
 </table>
 

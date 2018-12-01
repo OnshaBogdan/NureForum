@@ -18,7 +18,9 @@ class CategoryDetail(View):
         context = {'category': obj,
                    'topic_list': Topic.objects.filter(category=obj)
                    }
-
+        if request.user.is_authenticated:
+            user = ForumUser.objects.get(username=request.user.username)
+            context['user'] = user
         return render(request, 'forumengine/category_detail_template.html', context=context)
 
 
@@ -210,7 +212,7 @@ class MessageUpdate(LoginRequiredMixin, View):
         bound_form = self.model_form(instance=message)
 
         if message.author == user or user.is_staff:
-            return render(request, self.template, context={'form': bound_form, 'message': message})
+            return render(request, self.template, context={'form': bound_form, 'message': message, 'user':user})
 
         else:
             return redirect('topic_detail_view', slug=message.topic.slug)
