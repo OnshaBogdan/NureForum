@@ -13,6 +13,9 @@ class ForumUser(User):
     def get_absolute_url(self):
         return reverse('user_detail_url', kwargs={'id': self.id})
 
+    def get_update_url(self):
+        return reverse('user_update_url', kwargs={'id': self.id})
+
 
 class Category(models.Model):
     category_id = models.AutoField(primary_key=True)

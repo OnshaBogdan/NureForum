@@ -16,7 +16,7 @@ class UserForm(forms.ModelForm):
             'first_name': forms.TextInput(attrs=attrs),
             'last_name': forms.TextInput(attrs=attrs),
             'email': forms.EmailInput(attrs=attrs),
-            'password': forms.PasswordInput(attrs=attrs)
+            'password': forms.PasswordInput(attrs={'class': 'form-control', 'required': True, 'name': 'password'})
         }
 
 
@@ -52,6 +52,3 @@ class MessageForm(forms.ModelForm):
         vidgets = {
             'body': forms.Textarea(attrs={'class': 'form-control'}),
         }
-
-
-

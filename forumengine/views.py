@@ -200,6 +200,35 @@ class UserDetail(View):
                       )
 
 
+class UserUpdate(LoginRequiredMixin, View):
+    model = ForumUser
+    model_form = UserForm
+    template = 'forumengine/user_update_form.html'
+    raise_exception = True
+
+    def get(self, request, id):
+        obj = get_object_or_404(ForumUser, id=id)
+        bound_form = self.model_form(instance=obj)
+        return render(request, self.template, context={'form': bound_form, self.model.__name__.lower(): obj})
+
+    def post(self, request, id):
+        obj = self.model.objects.get(id=id)
+        bound_form = self.model_form(request.POST, instance=obj)
+
+        if bound_form.is_valid():
+            new_obj = bound_form.save()
+            ps = request.POST.get('password')
+            print(ps)
+            print(ps)
+            print(ps)
+            print(ps)
+            print(ps    )
+            new_obj.set_password(ps)
+            new_obj.save()
+            return redirect(new_obj)
+        return render(request, self.template, context={'form': bound_form, self.model.__name__.lower(): obj})
+
+
 class MessageUpdate(LoginRequiredMixin, View):
     model = Message
     model_form = MessageForm

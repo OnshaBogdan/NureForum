@@ -26,17 +26,17 @@
     </tr>
     {% if request.user.username == user.username %}
     <tr>
-        <tr>
+    <tr>
         <th>Email</th>
         <th>{{user.email}}</th>
     </tr>
 
     {%endif%}
 </table>
+<div class="container container-fluid">
 
-
-
-
+    <a class="link-unstyled" href="{{user.get_update_url}}"><i class="fas fa-edit fa-2x"></i></a>
+</div>
 
 
 {% endblock %}
