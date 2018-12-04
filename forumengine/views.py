@@ -8,6 +8,7 @@ from django.db.models import Q
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import authenticate, login, logout
 from .forms import *
+from django.db.models import Count
 import datetime
 
 
@@ -126,7 +127,7 @@ class BestMessages(View):
             messages = messages.order_by('-rating')
             return messages
 
-        form = FilterForm(request.POST)
+        form = MessageFilterForm(request.POST)
 
         if form.is_valid():
             username = form.cleaned_data['username']
@@ -155,7 +156,7 @@ class BestMessages(View):
         return render(request, 'forumengine/best_messages_template.html', context={})
 
     def get(self, request, time_range='2018-01-01'):
-        form = FilterForm()
+        form = MessageFilterForm()
         date_now = datetime.datetime.now().date()
 
         messages = Message.objects.filter(date_of_pub__range=(time_range, date_now)).order_by('-rating')
@@ -169,6 +170,79 @@ class BestMessages(View):
             'form': form
         }
         return render(request, 'forumengine/best_messages_template.html', context=context)
+
+
+class HotTopics(View):
+    def get(self, request):
+        form = TopicFilterForm()
+        topic_list = Topic.objects.all()
+        count = []
+        for topic in topic_list:
+            count.append(Message.objects.filter(topic=topic).count())
+
+        context = {
+            'topic_list': topic_list,
+            'count': count,
+            'form': form,
+        }
+        if request.user.is_authenticated:
+            user = ForumUser.objects.get(username=request.user.username)
+            context['user'] = user
+        return render(request, 'forumengine/hot_topics_template.html', context=context)
+
+    def post(self, request):
+        def topic_filter(title, username, lowest, highest, order):
+            topics = Topic.objects.all()
+
+            topics = topics.filter(title__icontains=title)
+
+            if username is not None:
+                users = ForumUser.objects.filter(Q(username__icontains=username) | Q(username=username))
+                topics = topics.filter(author__in=users)
+
+            if lowest < highest:
+                topics = topics.filter(rating__range=(lowest, highest))
+
+            if order == 'Author':
+                topics = topics.order_by('-author')
+            elif order == 'Rating':
+                topics = topics.order_by('-rating')
+            elif order == 'Date of pub':
+                topics = topics.order_by('-date_of_pub')
+            elif order == 'Category':
+                topics = topics.order_by('-category')
+            elif order == 'Count of messages':
+                topics = topics.annotate(msg_count=Count('message')).order_by('-msg_count')
+            return topics
+
+        form = TopicFilterForm(request.POST)
+
+        user = ForumUser.objects.get(username=request.user.username) if request.user.is_authenticated else None
+
+        if form.is_valid():
+            title = form.cleaned_data['title']
+            username = form.cleaned_data['username']
+            lowest_rating = form.cleaned_data['lowest_rating']
+            highest_rating = form.cleaned_data['highest_rating']
+            order = form.cleaned_data['order']
+
+            if lowest_rating is None:
+                lowest_rating = -100
+            if highest_rating is None:
+                highest_rating = 1000
+
+            topic_list = topic_filter(title, username, lowest_rating, highest_rating, order)
+            count = []
+            for topic in topic_list:
+                count.append(Message.objects.filter(topic=topic).count())
+            context = {
+                'topic_list': topic_list,
+                'user': user,
+                'form': form,
+                'count': count,
+            }
+
+            return render(request, 'forumengine/hot_topics_template.html', context=context)
 
 
 class UserCreate(ObjectCreateMixin, View):
@@ -218,11 +292,6 @@ class UserUpdate(LoginRequiredMixin, View):
         if bound_form.is_valid():
             new_obj = bound_form.save()
             ps = request.POST.get('password')
-            print(ps)
-            print(ps)
-            print(ps)
-            print(ps)
-            print(ps    )
             new_obj.set_password(ps)
             new_obj.save()
             return redirect(new_obj)
@@ -257,7 +326,7 @@ class MessageUpdate(LoginRequiredMixin, View):
 
 
 def users_list(request):
-    users = ForumUser.objects.order_by('-rating')[:10]
+    users = ForumUser.objects.order_by('-rating')
     context = {
         'users': users,
         'user': None

@@ -6,6 +6,7 @@ urlpatterns = [
     path('category/<str:slug>/', CategoryDetail.as_view(), name='category_detail_view'),
     path('topic/create/', create_topic, name='create_topic_url'),
     path('topic/<str:slug>/', TopicDetail.as_view(), name='topic_detail_view'),
+    path('topics/', HotTopics.as_view(), name='hot_topics_view'),
     path('user/<int:id>/', UserDetail.as_view(), name='user_detail_url'),
     path('user/update/<int:id>/', UserUpdate.as_view(), name='user_update_url'),
     path('sign-up/', UserCreate.as_view(), name='user_sign_up_url'),

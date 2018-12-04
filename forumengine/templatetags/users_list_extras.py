@@ -11,3 +11,7 @@ def order(self):
 @register.filter
 def hash(h, key):
     return h[key]
+
+@register.filter
+def atindex(List, i):
+    return List[int(i) - 1]

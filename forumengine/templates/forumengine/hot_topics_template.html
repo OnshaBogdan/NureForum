@@ -1,0 +1,51 @@
+{%extends 'base.html'%}
+{% load users_list_extras %}
+
+
+{% block content %}
+
+<div class="container-fluid">
+    <form action="{% url 'hot_topics_view' %}" method="post">
+        {% csrf_token %}
+        {{ form }}
+        <button type="submit" class="btn btn-primary mt-3">Apply</button>
+    </form>
+
+</div>
+<table class="table">
+    <thead class="thead-light">
+    <tr>
+        <th scope="col">#</th>
+        <th scope="col">Title</th>
+        <th scope="col">Category</th>
+        <th scope="col">Author</th>
+        <th scope="col">Rating</th>
+        <th scope="col">Count of messages</th>
+        <th scope="col">Date of pub</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for index, topic in topic_list|order %}
+    <tr>
+        {% if index == 1%}
+        <th scope="col"> {{ index }} <i class="fas fa-trophy gold fa-lg"></i></th>
+        {% elif index == 2 %}
+        <th scope="col"> {{ index }} <i class="fas fa-trophy silver "></i></th>
+        {% elif index == 3 %}
+        <th scope="col"> {{ index }} <i class="fas fa-trophy bronze fa-sm"></i></th>
+        {% else%}
+        <th scope="col">{{ index }}</th>
+        {% endif %}
+        <th scope="col"><a href={{topic.get_absolute_url}}>{{topic.title}}</a></th>
+        <th scope="col"><a href={{topic.category.get_absolute_url}}>{{topic.category.title}}</a></th>
+        <th scope="col"><a href={{topic.author.get_absolute_url}}>{{topic.author.username}}</a></th>
+        <th scope="col">{{topic.rating}}</th>
+        <th scope="col">{{count|atindex:index}}</th>
+        <th scope="col">{{topic.date_of_pub.month}}/{{topic.date_of_pub.day}}</th>
+    </tr>
+    {% endfor %}
+
+    </tbody>
+</table>
+
+{%endblock%}

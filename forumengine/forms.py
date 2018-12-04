@@ -20,7 +20,7 @@ class UserForm(forms.ModelForm):
         }
 
 
-class FilterForm(forms.Form):
+class MessageFilterForm(forms.Form):
     attrs = {'class': 'form-control'}
     CHOICES = (('Daily', 'Daily'), ('Weekly', 'Weekly'), ('Monthly', 'Monthly'), ('All time', 'All time'))
     username = forms.CharField(
@@ -42,6 +42,39 @@ class FilterForm(forms.Form):
         label='Rating to',
         widget=forms.NumberInput({'class': 'form-control', 'name': 'highest_rating'}),
         required=False
+    )
+
+
+class TopicFilterForm(forms.Form):
+    attrs = {'class': 'form-control'}
+    CHOICES = (('Rating', 'Rating'), ('Author', 'Author'), ('Category', 'Category'),
+               ('Date of pub', 'Date of pub'),('Count of messages', 'Count of messages'),)
+    title = forms.CharField(
+        label='Title',
+        max_length=50,
+        widget=forms.TextInput({'class': 'form-control', 'name': 'title'}),
+        required=False
+    )
+    username = forms.CharField(
+        label='Username',
+        max_length=50,
+        widget=forms.TextInput({'class': 'form-control', 'name': 'username'}),
+        required=False
+    )
+    lowest_rating = forms.IntegerField(
+        label='Rating from',
+        widget=forms.NumberInput({'class': 'form-control', 'name': 'lowest_rating'}),
+        required=False
+
+    )
+    highest_rating = forms.IntegerField(
+        label='Rating to',
+        widget=forms.NumberInput({'class': 'form-control', 'name': 'highest_rating'}),
+        required=False
+    )
+    order = forms.CharField(
+        label='Sort by',
+        widget=forms.Select(choices=CHOICES, attrs={'class': 'form-control', 'name': 'order'})
     )
 
 
