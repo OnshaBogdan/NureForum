@@ -13,7 +13,7 @@ urlpatterns = [
     path('logout/', logout_view, name='logout_url'),
     path('msg/create/', create_message, name='create_message_url'),
     path('msg/update/<int:message_id>/', MessageUpdate.as_view(), name='message_update_url'),
+    path('msg/delete/<int:message_id>/', delete_message, name='message_delete_url'),
     path('msg/vote/', VoteMessage.as_view(), name='vote_message_url'),
     path('msg/best/', BestMessages.as_view(), name='best_messages_url'),
-
 ]

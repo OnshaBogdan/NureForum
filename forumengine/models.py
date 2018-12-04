@@ -71,7 +71,7 @@ class Message(models.Model):
         if isPlus:
             self.rating += 1
             self.author.rating += 1
-            self.topic.rating +=1
+            self.topic.rating += 1
         else:
             self.rating -= 1
             self.author.rating -= 1
@@ -83,3 +83,6 @@ class Message(models.Model):
 
     def get_update_url(self):
         return reverse('message_update_url', kwargs={'message_id': self.message_id})
+
+    def get_delete_url(self):
+        return reverse('message_delete_url', kwargs={'message_id': self.message_id})

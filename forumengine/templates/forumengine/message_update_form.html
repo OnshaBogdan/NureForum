@@ -31,6 +31,7 @@ Edit Post {{ post.title }}- {{ block.super }}
 
         <button type="submit" class="btn btn-primary">Edit Message</button>
     </form>
+    <a class="btn btn-danger mt-5" href="{{message.get_delete_url}}" role="button">Delete Message</a>
 </div>
 
 {% endblock %}

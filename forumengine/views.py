@@ -212,7 +212,7 @@ class MessageUpdate(LoginRequiredMixin, View):
         bound_form = self.model_form(instance=message)
 
         if message.author == user or user.is_staff:
-            return render(request, self.template, context={'form': bound_form, 'message': message, 'user':user})
+            return render(request, self.template, context={'form': bound_form, 'message': message, 'user': user})
 
         else:
             return redirect('topic_detail_view', slug=message.topic.slug)
@@ -269,6 +269,14 @@ def sign_in(request):
 def logout_view(request):
     logout(request)
     return redirect('category_list_view')
+
+
+def delete_message(request, message_id):
+    msg = Message.objects.get(message_id=message_id)
+    topic = Topic.objects.get(topic_id=msg.topic.topic_id)
+    Message.objects.get(message_id=message_id).delete()
+
+    return redirect('topic_detail_view', slug=topic.slug)
 
 
 def create_message(request):
