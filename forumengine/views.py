@@ -4,13 +4,15 @@ from django.shortcuts import get_object_or_404
 from forumengine.models import *
 from forumengine.utils import *
 from django.core.paginator import Paginator
+from django.core.exceptions import PermissionDenied
 from django.db.models import Q
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import authenticate, login, logout
 from .forms import *
-from django.db.models import Count
+from django.db.models import Count, Sum, Avg, Max
+from django.db.models.functions import Length, Lower
 import datetime
-
+from django.utils import timezone
 
 class CategoryDetail(View):
 
@@ -111,7 +113,7 @@ class BestMessages(View):
 
             return date
 
-        def message_filter(user, time_range, lowest, highest):
+        def message_filter(user, time_range, lowest, highest, order):
             date_now = datetime.datetime.now()
             messages = Message.objects.all()
             if lowest is None:
@@ -124,7 +126,17 @@ class BestMessages(View):
 
             if lowest < highest:
                 messages = messages.filter(rating__range=(lowest, highest))
-            messages = messages.order_by('-rating')
+
+            if order == 'Message':
+                messages = messages.order_by(Length('body').asc())
+            elif order == 'Author':
+                messages = messages.order_by(Lower('author').asc())
+            elif order == 'Topic':
+                messages = messages.order_by('-topic')
+            elif order == 'Rating':
+                messages = messages.order_by('-rating')
+            elif order == 'Date of pub':
+                messages = messages.order_by('-date_of_pub')
             return messages
 
         form = MessageFilterForm(request.POST)
@@ -134,6 +146,7 @@ class BestMessages(View):
             time_range = time_range_to_date(form.cleaned_data['time_range'])
             lowest_rating = form.cleaned_data['lowest_rating']
             highest_rating = form.cleaned_data['highest_rating']
+            order = form.cleaned_data['order']
             if lowest_rating is None:
                 lowest_rating = -100
             if highest_rating is None:
@@ -143,7 +156,7 @@ class BestMessages(View):
                 user = ForumUser.objects.get(username=username)
             except forumengine.models.ForumUser.DoesNotExist:
                 user = None
-            messages = message_filter(user, time_range, lowest_rating, highest_rating)
+            messages = message_filter(user, time_range, lowest_rating, highest_rating, order)
 
             context = {
                 'message_list': messages,
@@ -283,19 +296,25 @@ class UserUpdate(LoginRequiredMixin, View):
     def get(self, request, id):
         obj = get_object_or_404(ForumUser, id=id)
         bound_form = self.model_form(instance=obj)
-        return render(request, self.template, context={'form': bound_form, self.model.__name__.lower(): obj})
 
-    def post(self, request, id):
-        obj = self.model.objects.get(id=id)
-        bound_form = self.model_form(request.POST, instance=obj)
+        user = ForumUser.objects.get(username=request.user.username)
+        if user == obj:
+            return render(request, self.template, context={'form': bound_form, self.model.__name__.lower(): obj})
+        else:
+            raise PermissionDenied
 
-        if bound_form.is_valid():
-            new_obj = bound_form.save()
-            ps = request.POST.get('password')
-            new_obj.set_password(ps)
-            new_obj.save()
-            return redirect(new_obj)
-        return render(request, self.template, context={'form': bound_form, self.model.__name__.lower(): obj})
+
+def post(self, request, id):
+    obj = self.model.objects.get(id=id)
+    bound_form = self.model_form(request.POST, instance=obj)
+
+    if bound_form.is_valid():
+        new_obj = bound_form.save()
+        ps = request.POST.get('password')
+        new_obj.set_password(ps)
+        new_obj.save()
+        return redirect(new_obj)
+    return render(request, self.template, context={'form': bound_form, self.model.__name__.lower(): obj})
 
 
 class MessageUpdate(LoginRequiredMixin, View):
@@ -323,6 +342,50 @@ class MessageUpdate(LoginRequiredMixin, View):
             new_obj = bound_form.save()
             return redirect(new_obj.topic)
         return render(request, self.template, context={'form': bound_form, self.model.__name__.lower(): message})
+
+
+class Statistics(View):
+    def get(self, request):
+        users_count = ForumUser.objects.all().count()
+        topics_count = Topic.objects.all().count()
+        messages_count = Message.objects.all().count()
+        rating_count = Message.objects.all().aggregate(Sum('rating'))
+        date_of_create = datetime.datetime.now() - datetime.datetime.strptime('2018 10 15', '%Y %m %d')
+
+        max_rating = ForumUser.objects.all().aggregate(Max('rating'))['rating__max']
+        best_user = ForumUser.objects.get(rating=max_rating)
+        msg_written = Message.objects.filter(author=best_user).count()
+        topics_created = Topic.objects.filter(author=best_user).count()
+
+        max_rating_topic = Topic.objects.all().aggregate(Max('rating'))['rating__max']
+        best_topic = Topic.objects.get(rating=max_rating_topic)
+        msg_written_topic = Message.objects.filter(topic=best_topic).count()
+        best_topic_lifetime = timezone.now()- best_topic.date_of_pub
+
+        max_rating_message = Message.objects.all().aggregate(Max('rating'))['rating__max']
+        best_message = Message.objects.get(rating=max_rating_message)
+        best_message_lifetime = timezone.now()- best_message.date_of_pub
+
+        context = {
+            'users_count': users_count,
+            'topics_count': topics_count,
+            'messages_count': messages_count,
+            'rating_count': rating_count['rating__sum'],
+            'date_of_create': date_of_create.days,
+            'max_rating': max_rating,
+            'best_user': best_user,
+            'msg_written': msg_written,
+            'topics_created': topics_created,
+            'best_topic':best_topic,
+            'max_rating_topic':max_rating_topic,
+            'msg_written_topic':msg_written_topic,
+            'best_topic_lifetime':best_topic_lifetime.days,
+            'max_rating_message':max_rating_message,
+            'best_message':best_message.body,
+            'best_message_lifetime':best_message_lifetime.days,
+            "best_message_author": best_message.author
+        }
+        return render(request, 'forumengine/statistics_template.html', context=context)
 
 
 def users_list(request):

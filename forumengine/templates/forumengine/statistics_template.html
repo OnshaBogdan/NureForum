@@ -1,0 +1,66 @@
+{% extends 'base.html'%}
+
+{%block content%}
+<div class="container-fluid title-container">
+    <h2 class="text-center mt-2 mb-3">Total statistics: </h2>
+</div>
+
+<div class="container container-fluid mt-5">
+    <div class="row">
+        <div class="col-8"><h4>Total users: {{users_count}}</h4></div>
+        <div class="col"><h4>Total topics: {{topics_count}}</h4></div>
+    </div>
+    <div class="row mb-5">
+        <div class="col-8"><h4>Total messages: {{messages_count}}</h4></div>
+        <div class="col"><h4>Total rating: {{rating_count}}</h4></div>
+    </div>
+    <div class="row">
+        <div class="col"><h4>Days since start: {{date_of_create}}</h4></div>
+
+    </div>
+
+</div>
+<div class="container-fluid title-container">
+    <h2 class="text-center mt-2 mb-3">Best user: </h2>
+</div>
+<div class="container container-fluid mt-5 mb-5">
+   <div class="row">
+       <div class="col-8"><h4>Most Active user: <a href="{{ best_user.get_absolute_url }}">{{best_user}}</a></h4></div>
+       <div class="col"><h4>With rating: {{max_rating}}</h4></div>
+   </div>
+    <div class="row">
+        <div class="col-8"><h4>Message written: {{msg_written}}</h4></div>
+       <div class="col"><h4>Topics created: {{topics_created}}</h4></div>
+    </div>
+
+</div>
+<div class="container-fluid title-container">
+    <h2 class="text-center mt-2 mb-3">Best topic: </h2>
+</div>
+<div class="container container-fluid mt-5 mb-5">
+   <div class="row">
+       <div class="col-8"><h4>Most popular topic: <a href="{{ best_topic.get_absolute_url }}">{{best_topic}}</a></h4></div>
+       <div class="col"><h4>With rating: {{max_rating_topic}}</h4></div>
+   </div>
+    <div class="row">
+        <div class="col-8"><h4>Message written: {{msg_written_topic}}</h4></div>
+       <div class="col"><h4>Lifetime: {{best_topic_lifetime}} days</h4></div>
+    </div>
+
+</div>
+</div>
+<div class="container-fluid title-container">
+    <h2 class="text-center mt-2 mb-3">Best message: </h2>
+</div>
+<div class="container container-fluid mt-5 mb-5">
+   <div class="row">
+       <div class="col-8"><h4>Best message: {{best_message}}</h4></div>
+       <div class="col"><h4>With rating: {{max_rating_message}}</h4></div>
+   </div>
+    <div class="row">
+        <div class="col-8"><h4>Written by: <a href="{{best_message_author.get_absolute_url}}">{{best_message_author}}</a></h4></div>
+       <div class="col"><h4>Lifetime: {{best_message_lifetime}} days</h4></div>
+    </div>
+
+</div>
+{%endblock%}

@@ -18,4 +18,5 @@ urlpatterns = [
     path('msg/delete/<int:message_id>/', delete_message, name='message_delete_url'),
     path('msg/vote/', VoteMessage.as_view(), name='vote_message_url'),
     path('msg/best/', BestMessages.as_view(), name='best_messages_url'),
+    path('statistics/', Statistics.as_view(), name='statistics_url'),
 ]
