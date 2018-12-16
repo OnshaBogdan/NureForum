@@ -45,6 +45,12 @@ class MessageFilterForm(forms.Form):
         widget=forms.NumberInput({'class': 'form-control', 'name': 'highest_rating'}),
         required=False
     )
+    body = forms.CharField(
+        label='body',
+        max_length=150,
+        widget=forms.TextInput({'class': 'form-control', 'name': 'body'}),
+        required=False
+    )
     order = forms.CharField(
         label='Sort by',
         widget=forms.Select(choices=CHOICES_sort, attrs={'class': 'form-control', 'name': 'order'})

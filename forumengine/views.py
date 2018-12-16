@@ -14,6 +14,7 @@ from django.db.models.functions import Length, Lower
 import datetime
 from django.utils import timezone
 
+
 class CategoryDetail(View):
 
     def get(self, request, slug):
@@ -113,7 +114,7 @@ class BestMessages(View):
 
             return date
 
-        def message_filter(user, time_range, lowest, highest, order):
+        def message_filter(user, time_range, lowest, highest, body, order):
             date_now = datetime.datetime.now()
             messages = Message.objects.all()
             if lowest is None:
@@ -122,7 +123,9 @@ class BestMessages(View):
                 highest = 1000
             if user is not None:
                 messages = messages.filter(author=user)
+
             messages = messages.filter(date_of_pub__range=(time_range, date_now))
+            messages = messages.filter(body__icontains=body)
 
             if lowest < highest:
                 messages = messages.filter(rating__range=(lowest, highest))
@@ -146,6 +149,7 @@ class BestMessages(View):
             time_range = time_range_to_date(form.cleaned_data['time_range'])
             lowest_rating = form.cleaned_data['lowest_rating']
             highest_rating = form.cleaned_data['highest_rating']
+            body = form.cleaned_data['body']
             order = form.cleaned_data['order']
             if lowest_rating is None:
                 lowest_rating = -100
@@ -156,7 +160,7 @@ class BestMessages(View):
                 user = ForumUser.objects.get(username=username)
             except forumengine.models.ForumUser.DoesNotExist:
                 user = None
-            messages = message_filter(user, time_range, lowest_rating, highest_rating, order)
+            messages = message_filter(user, time_range, lowest_rating, highest_rating, body, order)
 
             context = {
                 'message_list': messages,
@@ -352,37 +356,46 @@ class Statistics(View):
         rating_count = Message.objects.all().aggregate(Sum('rating'))
         date_of_create = datetime.datetime.now() - datetime.datetime.strptime('2018 10 15', '%Y %m %d')
 
-        max_rating = ForumUser.objects.all().aggregate(Max('rating'))['rating__max']
-        best_user = ForumUser.objects.get(rating=max_rating)
-        msg_written = Message.objects.filter(author=best_user).count()
-        topics_created = Topic.objects.filter(author=best_user).count()
+        #max_rating = ForumUser.objects.all().aggregate(Max('rating'))['rating__max']
+        #best_user = ForumUser.objects.get(rating=max_rating)
+        #msg_written = Message.objects.filter(author=best_user).count()
+        #topics_created = Topic.objects.filter(author=best_user).count()
 
         max_rating_topic = Topic.objects.all().aggregate(Max('rating'))['rating__max']
         best_topic = Topic.objects.get(rating=max_rating_topic)
         msg_written_topic = Message.objects.filter(topic=best_topic).count()
-        best_topic_lifetime = timezone.now()- best_topic.date_of_pub
+        best_topic_lifetime = timezone.now() - best_topic.date_of_pub
 
         max_rating_message = Message.objects.all().aggregate(Max('rating'))['rating__max']
         best_message = Message.objects.get(rating=max_rating_message)
-        best_message_lifetime = timezone.now()- best_message.date_of_pub
+        best_message_lifetime = timezone.now() - best_message.date_of_pub
 
+        top3_users = ForumUser.objects.all().order_by('-rating')[0:3]
+        msg_written, topics_created = [], []
+        for user in top3_users:
+            msg_written.append(Message.objects.filter(author=user).count())
+            topics_created.append(Topic.objects.filter(author=user).count())
+
+        print(topics_created)
+        print(topics_created)
+        print(topics_created)
+        print(topics_created)
         context = {
             'users_count': users_count,
             'topics_count': topics_count,
             'messages_count': messages_count,
             'rating_count': rating_count['rating__sum'],
             'date_of_create': date_of_create.days,
-            'max_rating': max_rating,
-            'best_user': best_user,
+            'top3_users': top3_users,
             'msg_written': msg_written,
             'topics_created': topics_created,
-            'best_topic':best_topic,
-            'max_rating_topic':max_rating_topic,
-            'msg_written_topic':msg_written_topic,
-            'best_topic_lifetime':best_topic_lifetime.days,
-            'max_rating_message':max_rating_message,
-            'best_message':best_message.body,
-            'best_message_lifetime':best_message_lifetime.days,
+            'best_topic': best_topic,
+            'max_rating_topic': max_rating_topic,
+            'msg_written_topic': msg_written_topic,
+            'best_topic_lifetime': best_topic_lifetime.days,
+            'max_rating_message': max_rating_message,
+            'best_message': best_message.body,
+            'best_message_lifetime': best_message_lifetime.days,
             "best_message_author": best_message.author
         }
         return render(request, 'forumengine/statistics_template.html', context=context)
